@@ -1,9 +1,8 @@
-import random # For generating random numbers
-import sys # We will use sys.exit to exit the program
+import random
+import sys
 import pygame
-from pygame.locals import * # Basic pygame imports
+from pygame.locals import *
 
-# Global Variables for the game
 FPS = 32
 SCREENWIDTH = 289
 SCREENHEIGHT = 511
@@ -27,12 +26,9 @@ def welcomeScreen():
     basex = 0
     while True:
         for event in pygame.event.get():
-            # if user clicks on cross button, close the game
             if event.type == QUIT or (event.type==KEYDOWN and event.key == K_ESCAPE):
                 pygame.quit()
                 sys.exit()
-
-            # If the user presses space or up key, start the game for them
             elif event.type==KEYDOWN and (event.key==K_SPACE or event.key == K_UP):
                 return
             else:
@@ -48,17 +44,14 @@ def mainGame():
     playerx = int(SCREENWIDTH/5)
     playery = int(SCREENWIDTH/2)
     basex = 0
-
-    # Create 2 pipes for blitting on the screen
+    
     newPipe1 = getRandomPipe()
     newPipe2 = getRandomPipe()
 
-    # my List of upper pipes
     upperPipes = [
         {'x': SCREENWIDTH+200, 'y':newPipe1[0]['y']},
         {'x': SCREENWIDTH+200+(SCREENWIDTH/2), 'y':newPipe2[0]['y']},
     ]
-    # my List of lower pipes
     lowerPipes = [
         {'x': SCREENWIDTH+200, 'y':newPipe1[1]['y']},
         {'x': SCREENWIDTH+200+(SCREENWIDTH/2), 'y':newPipe2[1]['y']},
@@ -71,8 +64,8 @@ def mainGame():
     playerMinVelY = -8
     playerAccY = 1
 
-    playerFlapAccv = -8 # velocity while flapping
-    playerFlapped = False # It is true only when the bird is flapping
+    playerFlapAccv = -8
+    playerFlapped = False
 
 
     while True:
@@ -87,11 +80,10 @@ def mainGame():
                     GAME_SOUNDS['wing'].play()
 
 
-        crashTest = isCollide(playerx, playery, upperPipes, lowerPipes) # This function will return true if the player is crashed
+        crashTest = isCollide(playerx, playery, upperPipes, lowerPipes)
         if crashTest:
             return     
 
-        #check for score
         playerMidPos = playerx + GAME_SPRITES['player'].get_width()/2
         for pipe in upperPipes:
             pipeMidPos = pipe['x'] + GAME_SPRITES['pipe'][0].get_width()/2
@@ -109,23 +101,19 @@ def mainGame():
         playerHeight = GAME_SPRITES['player'].get_height()
         playery = playery + min(playerVelY, GROUNDY - playery - playerHeight)
 
-        # move pipes to the left
         for upperPipe , lowerPipe in zip(upperPipes, lowerPipes):
             upperPipe['x'] += pipeVelX
             lowerPipe['x'] += pipeVelX
 
-        # Add a new pipe when the first is about to cross the leftmost part of the screen
         if 0<upperPipes[0]['x']<5:
             newpipe = getRandomPipe()
             upperPipes.append(newpipe[0])
             lowerPipes.append(newpipe[1])
 
-        # if the pipe is out of the screen, remove it
         if upperPipes[0]['x'] < -GAME_SPRITES['pipe'][0].get_width():
             upperPipes.pop(0)
             lowerPipes.pop(0)
         
-        # Lets blit our sprites now
         SCREEN.blit(GAME_SPRITES['background'], (0, 0))
         for upperPipe, lowerPipe in zip(upperPipes, lowerPipes):
             SCREEN.blit(GAME_SPRITES['pipe'][0], (upperPipe['x'], upperPipe['y']))
@@ -173,14 +161,13 @@ def getRandomPipe():
     pipeX = SCREENWIDTH + 10
     y1 = pipeHeight - y2 + offset
     pipe = [
-        {'x': pipeX, 'y': -y1}, #upper Pipe
-        {'x': pipeX, 'y': y2} #lower Pipe
+        {'x': pipeX, 'y': -y1},
+        {'x': pipeX, 'y': y2}
     ]
     return pipe
 
 if __name__ == "__main__":
-    # This will be the main point from where our game will start
-    pygame.init() # Initialize all pygame's modules
+    pygame.init()
     FPSCLOCK = pygame.time.Clock()
     pygame.display.set_caption('Flappy Bird by CodeWithHarry')
     GAME_SPRITES['numbers'] = ( 
@@ -202,7 +189,6 @@ if __name__ == "__main__":
     pygame.image.load(PIPE).convert_alpha()
     )
 
-    # Game sounds
     GAME_SOUNDS['die'] = pygame.mixer.Sound('gallery/audio/die.wav')
     GAME_SOUNDS['hit'] = pygame.mixer.Sound('gallery/audio/hit.wav')
     GAME_SOUNDS['point'] = pygame.mixer.Sound('gallery/audio/point.wav')
@@ -213,5 +199,5 @@ if __name__ == "__main__":
     GAME_SPRITES['player'] = pygame.image.load(PLAYER).convert_alpha()
 
     while True:
-        welcomeScreen() # Shows welcome screen to the user until he presses a button
-        mainGame() # This is the main game function 
+        welcomeScreen()
+        mainGame()
